@@ -1,0 +1,14 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -Iinclude -g
+LIBS = -lz -lcrypto
+
+# Find all source files in src/
+SRCS = $(wildcard src/*.c)
+# Convert .c filenames to .o
+OBJS = $(SRCS:.c=.o)
+
+clit: $(OBJS)
+	$(CC) $(CFLAGS) -o bin/clit $(OBJS) $(LIBS)
+
+clean:
+	rm -f src/*.o bin/clit
