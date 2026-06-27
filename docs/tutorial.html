@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLIT: Learn Git by Building It in C</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --ink: #162033;
+      --muted: #5b6475;
+      --panel: #ffffff;
+      --line: #d9dfeb;
+      --accent: #2563eb;
+      --accent-soft: #e8f0ff;
+      --green: #047857;
+      --green-soft: #e8f7ef;
+      --amber: #a16207;
+      --amber-soft: #fff7df;
+      --red: #be123c;
+      --red-soft: #fff1f2;
+      --code-bg: #111827;
+      --code-ink: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.62;
+    }
+
+    header {
+      background: #101827;
+      color: #fff;
+      padding: 42px 20px 34px;
+    }
+
+    header .inner,
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    h1, h2, h3, h4 {
+      line-height: 1.2;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 42px;
+    }
+
+    h2 {
+      margin-top: 44px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-size: 28px;
+    }
+
+    h3 {
+      margin-top: 24px;
+      font-size: 22px;
+    }
+
+    h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    p {
+      max-width: 920px;
+    }
+
+    a {
+      color: #1d4ed8;
+    }
+
+    main {
+      padding: 28px 0 64px;
+    }
+
+    code {
+      background: #eef2f7;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+
+    pre {
+      margin: 12px 0;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 8px;
+      color: var(--code-ink);
+      background: var(--code-bg);
+      line-height: 1.45;
+    }
+
+    pre code {
+      padding: 0;
+      color: inherit;
+      background: transparent;
+    }
+
+    table {
+      width: 100%;
+      margin: 16px 0;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef2f7;
+    }
+
+    .subtitle {
+      max-width: 850px;
+      color: #d5dbea;
+      font-size: 18px;
+    }
+
+    .panel {
+      margin: 18px 0;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .lesson {
+      border-left: 5px solid var(--accent);
+    }
+
+    .concept {
+      border-left: 5px solid var(--green);
+    }
+
+    .callout {
+      margin: 16px 0;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      background: var(--accent-soft);
+    }
+
+    .warning {
+      border-left-color: var(--amber);
+      background: var(--amber-soft);
+    }
+
+    .danger {
+      border-left-color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .good {
+      border-left-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .eight {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .box {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcff;
+    }
+
+    .box strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .mini {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 3px 4px 3px 0;
+      padding: 2px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .node {
+      min-width: 132px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .node span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .arrow {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .tree {
+      padding: 14px;
+      overflow-x: auto;
+      border-radius: 8px;
+      background: #f2f5fa;
+      font-family: Consolas, Monaco, monospace;
+      white-space: pre;
+    }
+
+    .checkpoint {
+      padding-left: 20px;
+    }
+
+    .checkpoint li {
+      margin: 6px 0;
+    }
+
+    @media (max-width: 740px) {
+      h1 {
+        font-size: 32px;
+      }
+
+      .arrow {
+        display: none;
+      }
+
+      .node {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <h1>CLIT: Learn Git by Building It in C</h1>
+      <p class="subtitle">A beginner-first tutorial for someone who knows basic C, but does not know Git internals yet. We will build the project one tiny idea at a time.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Start Here: You Are Not Supposed To Know This Yet</h2>
+      <p>If words like object database, staging area, tree, ref, or HEAD feel confusing, that is normal. Git hides a lot behind familiar commands. This tutorial does not assume you know Git internals. It starts from plain files and folders, then slowly builds toward the real model.</p>
+      <div class="callout good">
+        <strong>How to use this tutorial:</strong> For every concept, read the eight small boxes in order. Then write only the code for that milestone. Do not jump ahead. The point is to understand enough to explain it in an interview.
+      </div>
+      <div class="grid">
+        <div class="box"><strong>Your current level</strong><span class="mini">Basic C syntax, structs, linked lists, queues, and simple programs.</span></div>
+        <div class="box"><strong>What we will add</strong><span class="mini">Files, folders, byte buffers, hashes, compression, parsing, and command design.</span></div>
+        <div class="box"><strong>What we will avoid today</strong><span class="mini">Merges, remotes, packfiles, rebase, and Git's full binary index format.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>The Whole Project In One Picture</h2>
+      <p>CLIT is a program that takes snapshots of your project. A snapshot means: "these exact file contents existed at this time." Git stores those snapshots using small objects that point to each other.</p>
+      <div class="panel">
+        <div class="flow">
+          <div class="node">file content<span>bytes in README.md</span></div>
+          <div class="arrow">-&gt;</div>
+          <div class="node">blob<span>stores file bytes</span></div>
+          <div class="arrow">-&gt;</div>
+          <div class="node">index<span>staging list</span></div>
+          <div class="arrow">-&gt;</div>
+          <div class="node">tree<span>directory snapshot</span></div>
+          <div class="arrow">-&gt;</div>
+          <div class="node">commit<span>named snapshot</span></div>
+          <div class="arrow">-&gt;</div>
+          <div class="node">branch<span>latest commit</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>The Eight Questions We Use Every Time</h2>
+      <p>Every concept and milestone below follows this same pattern. This is the learning loop.</p>
+      <div class="eight">
+        <div class="box"><strong>1. What are we making?</strong>The plain-English goal.</div>
+        <div class="box"><strong>2. What command proves it?</strong>The terminal command you run.</div>
+        <div class="box"><strong>3. What files are involved?</strong>The C files and hidden CLIT files.</div>
+        <div class="box"><strong>4. What C do we need?</strong>The new C ideas for this step.</div>
+        <div class="box"><strong>5. What code shape?</strong>The functions and structs to write.</div>
+        <div class="box"><strong>6. Why does it work?</strong>The mental model behind the code.</div>
+        <div class="box"><strong>7. How do we test it?</strong>Small manual checks.</div>
+        <div class="box"><strong>8. What did we learn?</strong>The interview-ready takeaway.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Git Words From Zero</h2>
+
+      <article class="panel concept">
+        <h3>Concept: Repository</h3>
+        <div class="eight">
+          <div class="box"><strong>1. What is it?</strong>A normal project folder plus a hidden database folder.</div>
+          <div class="box"><strong>2. Command</strong><code>clit init</code></div>
+          <div class="box"><strong>3. Files</strong><code>.clit/</code>, <code>.clit/objects</code>, <code>.clit/refs</code>, <code>.clit/HEAD</code></div>
+          <div class="box"><strong>4. C needed</strong><code>mkdir</code>, <code>fopen</code>, <code>fprintf</code>, return codes.</div>
+          <div class="box"><strong>5. Code shape</strong>A <code>cmd_init</code> function creates folders and writes HEAD.</div>
+          <div class="box"><strong>6. Why it works</strong>CLIT needs one private place to store history separately from your files.</div>
+          <div class="box"><strong>7. Test</strong>Run <code>Get-ChildItem -Recurse .clit</code>.</div>
+          <div class="box"><strong>8. Learned</strong>Version control starts as filesystem organization.</div>
+        </div>
+      </article>
+
+      <article class="panel concept">
+        <h3>Concept: Commit</h3>
+        <div class="eight">
+          <div class="box"><strong>1. What is it?</strong>A saved snapshot with a message and parent pointer.</div>
+          <div class="box"><strong>2. Command</strong><code>clit commit -m "message"</code></div>
+          <div class="box"><strong>3. Files</strong>Commit object in <code>.clit/objects</code>, branch file in <code>.clit/refs/heads/main</code>.</div>
+          <div class="box"><strong>4. C needed</strong>String formatting, timestamps, file reads and writes.</div>
+          <div class="box"><strong>5. Code shape</strong>Create text payload, store as object, update branch ref.</div>
+          <div class="box"><strong>6. Why it works</strong>A commit remembers which tree was the project state.</div>
+          <div class="box"><strong>7. Test</strong>Print it with <code>clit cat-file -p &lt;hash&gt;</code>.</div>
+          <div class="box"><strong>8. Learned</strong>History is a chain of commit objects.</div>
+        </div>
+      </article>
+
+      <article class="panel concept">
+        <h3>Concept: Staging Area</h3>
+        <div class="eight">
+          <div class="box"><strong>1. What is it?</strong>A list of files you want in the next commit.</div>
+          <div class="box"><strong>2. Command</strong><code>clit add README.md</code></div>
+          <div class="box"><strong>3. Files</strong><code>.clit/index</code></div>
+          <div class="box"><strong>4. C needed</strong>Struct arrays, string comparison, updating a text file.</div>
+          <div class="box"><strong>5. Code shape</strong>Store path, mode, and blob hash for each staged file.</div>
+          <div class="box"><strong>6. Why it works</strong>You choose the next snapshot before making the commit.</div>
+          <div class="box"><strong>7. Test</strong>Open <code>.clit/index</code> and read the staged entries.</div>
+          <div class="box"><strong>8. Learned</strong><code>add</code> does not commit. It prepares.</div>
+        </div>
+      </article>
+
+      <article class="panel concept">
+        <h3>Concept: Hash</h3>
+        <div class="eight">
+          <div class="box"><strong>1. What is it?</strong>A fixed-length name calculated from content bytes.</div>
+          <div class="box"><strong>2. Command</strong><code>clit hash-object README.md</code></div>
+          <div class="box"><strong>3. Files</strong><code>src/sha1.c</code>, <code>src/object.c</code></div>
+          <div class="box"><strong>4. C needed</strong>Byte buffers, OpenSSL SHA-1, hex conversion.</div>
+          <div class="box"><strong>5. Code shape</strong>Read bytes, add header, hash the complete buffer.</div>
+          <div class="box"><strong>6. Why it works</strong>Same content gives the same hash. Different content gives a different hash.</div>
+          <div class="box"><strong>7. Test</strong>Run twice on the same file and compare output.</div>
+          <div class="box"><strong>8. Learned</strong>Git names data by what it contains.</div>
+        </div>
+      </article>
+
+      <article class="panel concept">
+        <h3>Concept: HEAD and Branch</h3>
+        <div class="eight">
+          <div class="box"><strong>1. What is it?</strong><code>HEAD</code> tells CLIT which branch is current.</div>
+          <div class="box"><strong>2. Command</strong><code>type .clit\HEAD</code></div>
+          <div class="box"><strong>3. Files</strong><code>.clit/HEAD</code>, <code>.clit/refs/heads/main</code></div>
+          <div class="box"><strong>4. C needed</strong>Read a small text file, trim newline, build a path.</div>
+          <div class="box"><strong>5. Code shape</strong>Resolve <code>ref: refs/heads/main</code> into a real file path.</div>
+          <div class="box"><strong>6. Why it works</strong>A branch is just a pointer to the latest commit.</div>
+          <div class="box"><strong>7. Test</strong>After commit, branch file should contain a commit hash.</div>
+          <div class="box"><strong>8. Learned</strong>Branches are lightweight because they are tiny files.</div>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <h2>Your Current Codebase</h2>
+      <p>You already have the project shape. Some files are empty, which is fine. We will fill them slowly.</p>
+      <table>
+        <thead>
+          <tr><th>File</th><th>Beginner explanation</th><th>What it should own</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>src/main.c</code></td><td>The front desk of the program.</td><td>Read command-line arguments and call the right command function.</td></tr>
+          <tr><td><code>src/repo.c</code></td><td>Repository setup and repository paths.</td><td><code>init</code>, HEAD, refs, repository discovery.</td></tr>
+          <tr><td><code>src/object.c</code></td><td>The object database.</td><td>Read, write, compress, decompress, and parse objects.</td></tr>
+          <tr><td><code>src/tree.c</code></td><td>Directory snapshots.</td><td>Build tree objects from staged files.</td></tr>
+          <tr><td><code>src/sha1.c</code></td><td>Hash helper.</td><td>Turn bytes into a 40-character SHA-1 string.</td></tr>
+          <tr><td><code>include/clit.h</code></td><td>Shared promises.</td><td>Declare structs and command functions other files need.</td></tr>
+          <tr><td><code>include/utils.h</code></td><td>Small reusable helpers.</td><td>Buffers, path helpers, and simple file helpers.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>The Build Milestones</h2>
+
+      <article class="panel lesson">
+        <h3>Milestone 1: Make <code>clit init</code> Real</h3>
+        <div class="eight">
+          <div class="box"><strong>1. What are we making?</strong>A command that turns a normal folder into a CLIT repository.</div>
+          <div class="box"><strong>2. What command proves it?</strong><code>bin\clit init</code></div>
+          <div class="box"><strong>3. What files are involved?</strong><code>src/main.c</code>, <code>src/repo.c</code>, <code>include/clit.h</code>, and the new <code>.clit</code> folder.</div>
+          <div class="box"><strong>4. What C do we need?</strong><code>argc</code>, <code>argv</code>, <code>strcmp</code>, <code>mkdir</code>, <code>fopen</code>, and checking return values.</div>
+          <div class="box"><strong>5. What code shape?</strong><code>main</code> checks the command name. <code>cmd_init</code> creates each folder once and writes HEAD.</div>
+          <div class="box"><strong>6. Why does it work?</strong>All future commands need a private database folder. <code>init</code> creates that database.</div>
+          <div class="box"><strong>7. How do we test it?</strong>Delete old <code>.clit</code>, run init, list folders, read HEAD.</div>
+          <div class="box"><strong>8. What did we learn?</strong>A repository is just a normal folder plus structured metadata.</div>
+        </div>
+        <h4>Sub-concept: command dispatch</h4>
+        <p><code>main</code> should behave like a traffic controller. It does not do the work itself. It reads <code>argv[1]</code> and calls the right command.</p>
+        <pre><code>if (argc &lt; 2) {
+    printf("usage: clit &lt;command&gt; [args]\n");
+    return 1;
+}
+
+if (strcmp(argv[1], "init") == 0) {
+    return cmd_init(argc - 1, argv + 1);
+}</code></pre>
+        <h4>Sub-concept: repository layout</h4>
+        <div class="tree">.clit/
+  HEAD                 says which branch is current
+  objects/             stores compressed blobs, trees, commits
+  refs/
+    heads/
+      main             will store latest commit hash later</div>
+        <pre><code>make
+bin\clit init
+Get-ChildItem -Recurse .clit
+Get-Content .clit\HEAD</code></pre>
+      </article>
+
+      <article class="panel lesson">
+        <h3>Milestone 2: Store File Content with <code>hash-object</code></h3>
+        <div class="eight">
+          <div class="box"><strong>1. What are we making?</strong>A command that turns one file into a stored object.</div>
+          <div class="box"><strong>2. What command proves it?</strong><code>bin\clit hash-object -w README.md</code></div>
+          <div class="box"><strong>3. What files are involved?</strong><code>src/object.c</code>, <code>src/sha1.c</code>, <code>include/utils.h</code>, <code>.clit/objects</code>.</div>
+          <div class="box"><strong>4. What C do we need?</strong>Read whole files, allocate buffers, hash bytes, compress bytes, write binary files.</div>
+          <div class="box"><strong>5. What code shape?</strong><code>read_file</code>, <code>make_object_buffer</code>, <code>sha1_hex</code>, <code>write_object</code>.</div>
+          <div class="box"><strong>6. Why does it work?</strong>The object name is based on the bytes, so CLIT can find identical content by hash.</div>
+          <div class="box"><strong>7. How do we test it?</strong>Run twice. Same file should print the same hash.</div>
+          <div class="box"><strong>8. What did we learn?</strong>Git stores content first, filenames later.</div>
+        </div>
+        <h4>Sub-concept: object header</h4>
+        <p>Git does not hash only the file bytes. It hashes a header plus the bytes. For a text file with 12 bytes, the object starts like this:</p>
+        <pre><code>blob 12\0hello world
+</code></pre>
+        <p>The <code>\0</code> is a NUL byte, not the characters backslash and zero. This is why we need byte buffers, not just strings.</p>
+        <h4>Sub-concept: object path</h4>
+        <p>If the hash is <code>abcdef...</code>, store it as:</p>
+        <pre><code>.clit/objects/ab/cdef...</code></pre>
+      </article>
+
+      <article class="panel lesson">
+        <h3>Milestone 3: Read Objects Back with <code>cat-file</code></h3>
+        <div class="eight">
+          <div class="box"><strong>1. What are we making?</strong>A command that proves stored objects can be read and understood.</div>
+          <div class="box"><strong>2. What command proves it?</strong><code>bin\clit cat-file -p &lt;hash&gt;</code></div>
+          <div class="box"><strong>3. What files are involved?</strong><code>src/object.c</code> and the compressed file under <code>.clit/objects</code>.</div>
+          <div class="box"><strong>4. What C do we need?</strong>Path building, binary file reads, decompression, parsing bytes.</div>
+          <div class="box"><strong>5. What code shape?</strong><code>read_object(hash)</code> returns type, size, and payload.</div>
+          <div class="box"><strong>6. Why does it work?</strong>The header tells CLIT what kind of object it loaded.</div>
+          <div class="box"><strong>7. How do we test it?</strong><code>-t</code> prints <code>blob</code>, <code>-p</code> prints original content.</div>
+          <div class="box"><strong>8. What did we learn?</strong>Storing data is only half the job. Parsing proves the format.</div>
+        </div>
+        <h4>Sub-concept: parsing the header</h4>
+        <pre><code>blob 12\0hello world
+^^^^ ^^  ^^^^^^^^^^^
+type size payload</code></pre>
+      </article>
+
+      <article class="panel lesson">
+        <h3>Milestone 4: Stage Files with <code>add</code> and <code>status</code></h3>
+        <div class="eight">
+          <div class="box"><strong>1. What are we making?</strong>A staging list for the next snapshot.</div>
+          <div class="box"><strong>2. What command proves it?</strong><code>bin\clit add README.md</code> then <code>bin\clit status</code></div>
+          <div class="box"><strong>3. What files are involved?</strong><code>src/index.c</code>, <code>src/object.c</code>, <code>.clit/index</code>.</div>
+          <div class="box"><strong>4. What C do we need?</strong>Structs, arrays, string comparison, reading and rewriting text files.</div>
+          <div class="box"><strong>5. What code shape?</strong>An <code>IndexEntry</code> struct with path, mode, and hash.</div>
+          <div class="box"><strong>6. Why does it work?</strong>The index says what should go into the next commit.</div>
+          <div class="box"><strong>7. How do we test it?</strong>Read <code>.clit/index</code> after adding a file.</div>
+          <div class="box"><strong>8. What did we learn?</strong>Staging is a deliberate preparation step.</div>
+        </div>
+        <h4>Sub-concept: simple index format</h4>
+        <pre><code>100644 &lt;blob-hash&gt; README.md
+100644 &lt;blob-hash&gt; src/main.c</code></pre>
+        <p>This is not Git's real binary index. That is okay. We are learning the model first.</p>
+      </article>
+
+      <article class="panel lesson">
+        <h3>Milestone 5: Create Directory Snapshots with <code>write-tree</code></h3>
+        <div class="eight">
+          <div class="box"><strong>1. What are we making?</strong>A tree object that represents staged files as a snapshot.</div>
+          <div class="box"><strong>2. What command proves it?</strong><code>bin\clit write-tree</code></div>
+          <div class="box"><strong>3. What files are involved?</strong><code>src/tree.c</code>, <code>.clit/index</code>, <code>.clit/objects</code>.</div>
+          <div class="box"><strong>4. What C do we need?</strong>Read entries, sort them, format tree payload, store object.</div>
+          <div class="box"><strong>5. What code shape?</strong><code>cmd_write_tree</code> loads index entries and writes a tree object.</div>
+          <div class="box"><strong>6. Why does it work?</strong>A tree connects filenames to blob hashes.</div>
+          <div class="box"><strong>7. How do we test it?</strong>Print the tree with <code>cat-file -p</code>.</div>
+          <div class="box"><strong>8. What did we learn?</strong>A project snapshot is a directory object pointing to file objects.</div>
+        </div>
+        <h4>Sub-concept: flat tree first</h4>
+        <p>To keep the first version understandable, start with a flat tree. Recursive folders can come after the simple version works.</p>
+      </article>
+
+      <article class="panel lesson">
+        <h3>Milestone 6: Save History with <code>commit</code></h3>
+        <div class="eight">
+          <div class="box"><strong>1. What are we making?</strong>A commit object that names a snapshot and links to previous history.</div>
+          <div class="box"><strong>2. What command proves it?</strong><code>bin\clit commit -m "first commit"</code></div>
+          <div class="box"><strong>3. What files are involved?</strong><code>src/commit.c</code>, <code>.clit/HEAD</code>, <code>.clit/refs/heads/main</code>.</div>
+          <div class="box"><strong>4. What C do we need?</strong>String building, timestamps, ref resolution, object writing.</div>
+          <div class="box"><strong>5. What code shape?</strong>Write tree, build commit payload, store commit object, update branch file.</div>
+          <div class="box"><strong>6. Why does it work?</strong>The branch file moves forward to the newest commit hash.</div>
+          <div class="box"><strong>7. How do we test it?</strong>Read <code>.clit/refs/heads/main</code> and inspect the commit object.</div>
+          <div class="box"><strong>8. What did we learn?</strong>A commit is a small text object that points to a full snapshot.</div>
+        </div>
+        <h4>Sub-concept: commit payload</h4>
+        <pre><code>tree &lt;tree-hash&gt;
+parent &lt;parent-commit-hash&gt;
+author Your Name &lt;you@example.com&gt; &lt;timestamp&gt;
+
+message here</code></pre>
+      </article>
+
+      <article class="panel lesson">
+        <h3>Milestone 7: Print History with <code>log</code></h3>
+        <div class="eight">
+          <div class="box"><strong>1. What are we making?</strong>A command that walks commit history backward.</div>
+          <div class="box"><strong>2. What command proves it?</strong><code>bin\clit log</code></div>
+          <div class="box"><strong>3. What files are involved?</strong><code>src/commit.c</code>, branch ref, commit objects.</div>
+          <div class="box"><strong>4. What C do we need?</strong>Loops, parsing lines, copying hash strings safely.</div>
+          <div class="box"><strong>5. What code shape?</strong>Start at current commit, print, replace current hash with parent hash.</div>
+          <div class="box"><strong>6. Why does it work?</strong>Each commit knows its parent, so history is a chain.</div>
+          <div class="box"><strong>7. How do we test it?</strong>Make two commits and confirm newest appears first.</div>
+          <div class="box"><strong>8. What did we learn?</strong>Git history is pointer traversal.</div>
+        </div>
+      </article>
+
+      <article class="panel lesson">
+        <h3>Milestone 8: Restore Files with Basic <code>checkout</code></h3>
+        <div class="eight">
+          <div class="box"><strong>1. What are we making?</strong>A safe restore command for a chosen commit.</div>
+          <div class="box"><strong>2. What command proves it?</strong><code>bin\clit checkout &lt;commit-hash&gt;</code></div>
+          <div class="box"><strong>3. What files are involved?</strong><code>src/checkout.c</code>, commit object, tree object, blob objects.</div>
+          <div class="box"><strong>4. What C do we need?</strong>Object parsing, writing files, safety checks before overwriting.</div>
+          <div class="box"><strong>5. What code shape?</strong>Resolve commit, load tree, load each blob, write files.</div>
+          <div class="box"><strong>6. Why does it work?</strong>The commit points to a tree, and the tree points to every blob.</div>
+          <div class="box"><strong>7. How do we test it?</strong>Change a file, checkout an older commit, inspect the file.</div>
+          <div class="box"><strong>8. What did we learn?</strong>Checkout rebuilds files from stored objects.</div>
+        </div>
+        <div class="callout danger">
+          <strong>Beginner safety rule:</strong> Your first checkout should refuse to overwrite changed files. A safe partial implementation is better than a dangerous complete-looking one.
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <h2>One-Day Build Order</h2>
+      <ol class="checkpoint">
+        <li>Fix <code>main.c</code> command dispatch and <code>cmd_init</code>.</li>
+        <li>Write byte-buffer helpers before object code.</li>
+        <li>Implement <code>hash-object</code> without <code>-w</code>, then add storing.</li>
+        <li>Implement <code>cat-file</code> so stored objects are inspectable.</li>
+        <li>Build a simple text index for <code>add</code> and <code>status</code>.</li>
+        <li>Build flat <code>write-tree</code>.</li>
+        <li>Build <code>commit</code> and update <code>refs/heads/main</code>.</li>
+        <li>Build <code>log</code>.</li>
+        <li>Build conservative <code>checkout</code>.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Manual Verification Path</h2>
+      <p>Every time you finish a milestone, run a tiny proof. If you cannot prove it from the terminal, do not move on yet.</p>
+      <pre><code>make
+bin\clit init
+bin\clit hash-object -w README.md
+bin\clit cat-file -p &lt;hash-from-previous-step&gt;
+bin\clit add README.md
+bin\clit status
+bin\clit write-tree
+bin\clit commit -m "first commit"
+bin\clit log</code></pre>
+    </section>
+
+    <section>
+      <h2>Debugging For Beginners</h2>
+      <div class="grid">
+        <div class="callout"><strong>When a command crashes:</strong> Print the values of <code>argc</code>, <code>argv[1]</code>, and the path you are opening.</div>
+        <div class="callout"><strong>When a file is missing:</strong> Check whether the program is running from the repository root.</div>
+        <div class="callout"><strong>When hashes differ:</strong> Check the exact header and file size. One byte changes the hash.</div>
+        <div class="callout"><strong>When parsing is confusing:</strong> Print one line at a time and label what you think each part means.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>How To Talk About This On A Resume</h2>
+      <div class="callout good">
+        Built a Git-like version control system in C with repository initialization, content-addressed object storage, compressed blob objects, a staging index, tree snapshots, commit objects, history traversal, and basic checkout.
+      </div>
+      <p>In interviews, be honest about simplifications. Say that the first version uses a learning-friendly index format, starts with simple tree handling, and does not implement remotes or merges yet.</p>
+    </section>
+
+    <section>
+      <h2>Extra Resources</h2>
+      <p>Use these after you understand the beginner model above. Do not start here if Git internals still feel foggy.</p>
+      <ul>
+        <li><a href="https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain">Pro Git: Git Internals - Plumbing and Porcelain</a></li>
+        <li><a href="https://git-scm.com/book/en/v2/Git-Internals-Git-Objects">Pro Git: Git Objects</a></li>
+        <li><a href="https://git-scm.com/docs/git-hash-object">git-hash-object documentation</a></li>
+        <li><a href="https://git-scm.com/docs/git-cat-file">git-cat-file documentation</a></li>
+        <li><a href="https://zlib.net/manual.html">zlib manual</a></li>
+        <li><a href="https://docs.openssl.org/">OpenSSL documentation</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>
